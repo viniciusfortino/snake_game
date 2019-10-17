@@ -9,7 +9,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -54,6 +57,36 @@ class SnakeGame extends SurfaceView implements Runnable {
 
         Bitmap preScaledBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.background);
         mBackgroundBitmap = Bitmap.createScaledBitmap(preScaledBitmap, size.x, size.y, true);
+
+        // Initialize the SoundPool
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build();
+
+            mSP = new SoundPool.Builder()
+                    .setMaxStreams(5)
+                    .setAudioAttributes(audioAttributes)
+                    .build();
+        } else {
+            //Method for verions before LOLLIPOP
+            mSP = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        }
+
+        try {
+            AssetManager assetManager = context.getAssets();
+            AssetFileDescriptor descriptor;
+
+            descriptor = assetManager.openFd("get_apple.ogg");
+            mEat_ID = mSP.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("snake_death.ogg");
+            mCrashID = mSP.load(descriptor, 0);
+
+        } catch (IOException e) {
+            Log.e("ERROR: ", e.getMessage());
+        }
 
         mSurfaceHolder = getHolder();
         mPaint = new Paint();
@@ -123,9 +156,11 @@ class SnakeGame extends SurfaceView implements Runnable {
         if (mSnake.checkDinner(mApple.getLocation())) {
             mApple.spawn();
             mScore = mScore + 1;
+            mSP.play(mEat_ID, 1, 1, 0, 0, 1);
         }
 
         if (mSnake.detectDeath()) {
+            mSP.play(mCrashID, 1, 1, 0, 0, 1);
             mPaused = true;
         }
     }
