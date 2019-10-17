@@ -29,6 +29,7 @@ public class SnakeActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        mSnakeGame.resume();
     }
 
     /**
@@ -37,5 +38,6 @@ public class SnakeActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        mSnakeGame.pause();
     }
 }
