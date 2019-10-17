@@ -62,6 +62,11 @@ class SnakeGame extends SurfaceView implements Runnable {
                 new Point(NUM_BLOCKS_WIDE,
                         mNumBlocksHigh),
                 mblockSize);
+
+        mSnake = new Snake(context,
+                new Point(NUM_BLOCKS_WIDE,
+                        mNumBlocksHigh),
+                mblockSize);
     }
 
     /**
@@ -69,6 +74,7 @@ class SnakeGame extends SurfaceView implements Runnable {
      */
     public void newGame() {
 
+        mSnake.reset(NUM_BLOCKS_WIDE, mNumBlocksHigh);
         mApple.spawn();
 
         mScore = 0;
@@ -112,11 +118,20 @@ class SnakeGame extends SurfaceView implements Runnable {
      * Method responsible for update not static objects
      */
     public void update() {
+        mSnake.move();
 
+        if (mSnake.checkDinner(mApple.getLocation())) {
+            mApple.spawn();
+            mScore = mScore + 1;
+        }
+
+        if (mSnake.detectDeath()) {
+            mPaused = true;
+        }
     }
 
     /**
-     *  Method responsible for draw game objets and scenario
+     * Method responsible for draw game objets and scenario
      */
     public void draw() {
         if (mSurfaceHolder.getSurface().isValid()) {
@@ -128,6 +143,7 @@ class SnakeGame extends SurfaceView implements Runnable {
             mCanvas.drawText(getResources().getString(R.string.score) + mScore, 20, 120, mPaint);
 
             mApple.draw(mCanvas, mPaint);
+            mSnake.draw(mCanvas, mPaint);
 
             if (mPaused) {
                 mPaint.setColor(Color.argb(255, 255, 255, 255));
@@ -160,6 +176,8 @@ class SnakeGame extends SurfaceView implements Runnable {
 
             case MotionEvent.ACTION_MOVE | MotionEvent.ACTION_DOWN:
                 if (!mPaused) {
+                    Point touchedBlock = new Point((int) motionEvent.getX() / mblockSize, (int) motionEvent.getY() / mblockSize);
+                    mSnake.switchHeading(touchedBlock);
                 }
                 break;
             default:

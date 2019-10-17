@@ -18,13 +18,13 @@ class Apple {
     /**
      * Apple Classe definition
      *
-     * @param context receveid from activity
-     * @param sr      contains the amount of side blocks
-     * @param s       contais the blocksize
+     * @param context    receveid from activity
+     * @param blockRange contains the amount of side blocks
+     * @param blockSize  contais the blocksize
      */
-    public Apple(Context context, Point sr, int s) {
-        mSpawnRange = sr;
-        mSize = s;
+    public Apple(Context context, Point blockRange, int blockSize) {
+        mSpawnRange = blockRange;
+        mSize = blockSize;
         mLocation.x = -10;
 
         mBitmapApple = BitmapFactory
@@ -32,7 +32,7 @@ class Apple {
                         R.drawable.apple);
 
         mBitmapApple = Bitmap
-                .createScaledBitmap(mBitmapApple, s, s, false);
+                .createScaledBitmap(mBitmapApple, blockSize, blockSize, false);
     }
 
     /**
@@ -45,7 +45,6 @@ class Apple {
     }
 
     /**
-     *
      * @return apple location
      */
     public Point getLocation() {
@@ -54,8 +53,9 @@ class Apple {
 
     /**
      * Method reponsible for draw apple on screen
+     *
      * @param canvas where to draw
-     * @param paint how to draw
+     * @param paint  how to draw
      */
     public void draw(Canvas canvas, Paint paint) {
         canvas.drawBitmap(mBitmapApple,
